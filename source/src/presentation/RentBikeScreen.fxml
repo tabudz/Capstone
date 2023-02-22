@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane layoutX="-1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="presentation.RentBikeScreen">
+   <children>
+      <Label layoutX="225.0" layoutY="208.0" text="Vui lòng nhập Barcode của xe" textFill="#71bf40">
+         <font>
+            <Font name="Segoe UI Bold" size="35.0" />
+         </font>
+      </Label>
+      <TextField fx:id="barcode" alignment="CENTER" layoutX="301.0" layoutY="300.0" promptText="Nhập Barcode">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </TextField>
+      <Button layoutX="394.0" layoutY="415.0" mnemonicParsing="false" onAction="#handleButtonThueXe" style="-fx-background-color: #71bf40;" text="Thuê xe" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="22.0" />
+         </font>
+      </Button>
+      <AnchorPane prefHeight="80.0" prefWidth="900.0" style="-fx-border-color: #ddd;">
+         <children>
+            <ImageView fitHeight="74.0" fitWidth="91.0" layoutX="7.0" layoutY="4.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../images/logo.png" />
+               </image>
+            </ImageView>
+            <Label layoutX="117.0" layoutY="17.0" text="Barcode" textFill="#71bf40">
+               <font>
+                  <Font name="System Bold" size="36.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

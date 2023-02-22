@@ -1,0 +1,183 @@
+package presentation;
+import businesslogic.controller.ViewController;
+import dataaccess.BikeDA;
+import entities.Bike;
+import entities.Dock;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.ListView;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import presentation.box.NotificationBox;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+
+/**
+ * Giao diện chính sau khi người dùng khởi động ứng dụng
+ */
+public class MainScreen implements Initializable {
+    public static boolean reset = false;
+    ArrayList<Dock> docks;
+
+    @FXML
+    private ListView<String> docksView;
+
+
+
+    public void handleRentButtonClick() {
+        try {
+            System.out.println("user click RentBikeButton");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("RentBikeScreen.fxml"));
+            Parent root = (Parent) loader.load();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.setTitle("RentBikeScreen");
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void handleViewDockButtonClick() {
+        System.out.println("user click RentBikeButton");
+        String dockInfo = docksView.getSelectionModel().getSelectedItem();
+        Dock dock = getDockFromString(dockInfo);
+
+        showViewDockScreen(dock);
+
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        System.out.println("Initialize main screen");
+        // generate fake docks dataset
+        docks = ViewController.getDocks();
+
+        //show list of docks
+        for (Dock dock : docks) {
+            docksView.getItems().add(dock.getGeneralInfo());
+        }
+
+        //listen when user double click on the dock in listview => show ViewDockScreen
+        docksView.setOnMouseClicked(click -> {
+            if (click.getClickCount() == 2) {
+                handleDoubleClickOnDockList();
+            }
+        });
+    }
+
+    private void handleDoubleClickOnDockList() {
+        System.out.println("User double on a dock");
+        String dockInfo = docksView.getSelectionModel().getSelectedItem();
+        Dock dock = getDockFromString(dockInfo);
+
+        showViewDockScreen(dock);
+    }
+
+    /**
+     * Khi người dùng click vào một dòng trong danh sách bãi xe, hàm sẽ tiến hành tìm kiếm đối tượng bãi xe tương
+     * ứng bằng cách so sánh string từ giao diện gửi về và string của bãi xe trong danh sách bãi xe docks
+     * @param dockInfo: string của bãi xe gửi về từ giao diện
+     * @return: bãi xe tương ứng hoặc null trong trường hợp không tồn tại
+     */
+    private Dock getDockFromString(String dockInfo) {
+
+        for (Dock dock : docks) {
+            String s = dock.getGeneralInfo();
+            if (dockInfo.equals(s)) {
+                return dock;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Hiển thị giao diện xem thông tin bãi xe
+     * @param dock: đối tượng bãi xe chứa thông tin cần hiển thị
+     */
+    public void showViewDockScreen(Dock dock) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("DockScreen.fxml"));
+            Parent root = loader.load();
+
+            DockScreen viewDockController = loader.getController();
+
+            viewDockController.initData(dock);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.setTitle("ViewDockScreen");
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void handleReturnButtonClick() {
+        try{
+            System.out.println("user click ReturnBikeButton");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("RentalCodeScreen.fxml"));
+            Parent root = loader.load();
+
+            RentalCodeScreen rentalCodeScreen = loader.getController();
+            rentalCodeScreen.initData(this.docks);
+//          returnBikeController.initData(docks);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.setTitle("RentalCodeScreen");
+            stage.showAndWait();
+            System.out.println("Finish ReturnBike");
+            if(MainScreen.reset){
+                System.out.println("Reset and reload data from database");
+                docks = ViewController.getDocks();
+                docksView.getItems().clear();
+                //show list of docks
+                for (Dock dock : docks) {
+                    docksView.getItems().add(dock.getGeneralInfo());
+                }
+                MainScreen.reset = false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    public void handleViewBikeButtonClick(){
+        ArrayList<ArrayList<String>> s = BikeDA.getRentingBikes();
+        if (s.size() > 0) {
+            String bikeID = s.get(0).get(1);
+            Bike bike = BikeDA.getBikeByID(bikeID);
+            try{
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("BikeDetailScreen.fxml"));
+                Parent root = loader.load();
+
+                BikeDetailScreen viewBikeController = loader.getController();
+
+                viewBikeController.init(bike);
+
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setScene(new Scene(root));
+                stage.setTitle("ViewBikeScreen");
+                stage.showAndWait();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+
+        }else{
+            NotificationBox.display("NotificationBox","Hiện không có xe nào đang thuê");
+        }
+
+    }
+}
